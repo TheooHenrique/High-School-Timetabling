@@ -1,0 +1,21 @@
+-> Descrição do que já foi feito:
+    Como já temos um pdf estabelecendo a estrutura que o programa deve ter para simular um caso real, criamos
+a abstração em c++ do problema que iremos resolver com o algoritmo DSatur.
+
+    Abolimos a ideia de utilizar herança para definir o ano de cada turma, pois optamos por um tipo chamado 'ano'
+que estabelece qual ano cada turma estará, e esse tipo definirá o atributo 'serie' e o atributo 'disciplinasObrigatorias'.
+
+    Construimos também a classe principal que representará o vértice no grafo. Seu atributo referente à cor é 'horario', pois
+o conceito de horario nesse problema é uma abstração da coloração.
+
+-> O que falta fazer:
+    -- Escrever os arquivos representantes dos casos de teste elaborados na unidade 2
+        -- Testar os inputs desses arquivos
+        -- Maybe asserts também..?
+    -- Aplicação do algoritimo DSatur para resolver o problema já modelado
+    -- Estabelecer estrutura para a exibição da tabela final
+
+-> Das dúvidas e dificuldades
+    -- Possíveis segmentation faults no código, pois a maioria das classes recebem em sua construção referências.
+        -- Talvez seria interessante utilizar recursos como "shared_ptr" ou evitar compartilhamento de memória.
+
