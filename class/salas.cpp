@@ -1,7 +1,7 @@
-#include <string>
-using namespace std;
 class Sala {
 public:
-    string id;
-    int capacidade;
+    Sala(int id) {
+        this->id = id;
+    }
+    int id;
 };
