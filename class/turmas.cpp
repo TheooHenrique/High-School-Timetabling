@@ -1,40 +1,23 @@
+#ifndef TURMA
+#define TURMA
+#include <memory>
 #include <vector>
 #include "disciplina.cpp"
+#include "ano.cpp"
 using namespace std;
-
-enum ano {
-    PRIMEIRO = 0,
-    SEGUNDO,
-    TERCEIRO
-};
 
 class Turma {
     public:
-        Turma(ano serie, int id, int numDeAlunos, vector<vector<Disciplina>> disciplinasObrigatoriasPorTurma) {
+
+        anoEscolar serie;
+        int id;
+        vector<shared_ptr<Disciplina>> disciplinasObrigatorias;
+
+        Turma(anoEscolar serie, int id, int numDeAlunos, vector<shared_ptr<Disciplina>> disciplinasObrigatoriasPorTurma) {
             this->serie = serie;
             this->id = id;
-
-            switch (serie) {
-                case (PRIMEIRO):
-                    {
-                        disciplinasObrigatorias = disciplinasObrigatoriasPorTurma[PRIMEIRO];
-                        break;
-                    }
-                case (SEGUNDO):
-                    {
-                        disciplinasObrigatorias = disciplinasObrigatoriasPorTurma[SEGUNDO];
-                        break;
-                    }
-                case (TERCEIRO):
-                    {
-                        disciplinasObrigatorias = disciplinasObrigatoriasPorTurma[TERCEIRO];
-                        break;
-                    }
-            }
-
+            this->disciplinasObrigatorias = disciplinasObrigatoriasPorTurma;
         }
 
-        ano serie;
-        int id;
-        vector<Disciplina> disciplinasObrigatorias;
 };
+#endif

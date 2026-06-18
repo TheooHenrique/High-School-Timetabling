@@ -1,7 +1,13 @@
+#ifndef SALA
+#define SALA
 class Sala {
-public:
+    
+    public:
+    int id;
+    
     Sala(int id) {
         this->id = id;
     }
-    int id;
+    
 };
+#endif
