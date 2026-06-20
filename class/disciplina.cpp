@@ -9,12 +9,10 @@ public:
 
     int id;
     string nome;
-    int cargaHorariaSemanal;
     
-    Disciplina(int id, string nome, int cargaHorariaSemanal) {
+    Disciplina(int id, string nome) {
         this->id = id;
         this->nome = nome;
-        this->cargaHorariaSemanal = cargaHorariaSemanal;
     }
 
 };

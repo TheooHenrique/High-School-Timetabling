@@ -12,11 +12,13 @@ class Turma {
         anoEscolar serie;
         int id;
         vector<shared_ptr<Disciplina>> disciplinasObrigatorias;
+        vector<int> cargaHorariaPorDisciplina;
 
-        Turma(anoEscolar serie, int id, int numDeAlunos, vector<shared_ptr<Disciplina>> disciplinasObrigatoriasPorTurma) {
+        Turma(anoEscolar serie, int id, vector<shared_ptr<Disciplina>> disciplinasObrigatoriasPorTurma, vector<int> CargaHorariaPorDisciplina) {
             this->serie = serie;
             this->id = id;
             this->disciplinasObrigatorias = disciplinasObrigatoriasPorTurma;
+            this->cargaHorariaPorDisciplina = CargaHorariaPorDisciplina;
         }
 
 };
