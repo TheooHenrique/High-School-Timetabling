@@ -3,7 +3,7 @@
 2
 
 3
-Matmática
+Matemática
 Ciências
 Química
 4
@@ -27,5 +27,15 @@ Sociologia
 4
 4
 2
+
+Lucilo
+Jackson
+Monteiro
+Jussara
+Ricardo
+Romero
+Andrea
+Aline
+Lúcia
 
 6
