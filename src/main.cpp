@@ -7,6 +7,13 @@
 #include <iostream>
 using namespace std;
 
+bool conflito(shared_ptr<Aula>a, shared_ptr<Aula>b) {
+    if (a->prof == b->prof || a->turma == b->turma || a->sala == b->sala) {
+        return true;
+    }
+    return false;
+}
+
 shared_ptr<Disciplina> buscarDisciplinaPorNome(
         const vector<shared_ptr<Disciplina>>& listaDisciplinas, 
         const string& nomeBuscado
@@ -242,4 +249,28 @@ int main() {
             << endl;
     }
 
+    size_t a = 0;
+    size_t b = 10;
+
+    cout
+        << endl << endl
+        << "----------------------------------------"
+        << endl
+        << "Teste de Conflito:"
+        << endl
+        << "----------------------------------------"
+        << endl << endl;
+
+
+    if (conflito(aulas[a], aulas[b])) {
+        cout
+            << "Conflito: Aula " << aulas[a]->id << " e Aula " << aulas[b]->id
+            << endl
+            << "├── Sala " << aulas[a]->sala->id << " e Sala " << aulas[b]->sala->id
+            << endl
+            << "├── Turma " << aulas[a]->turma->id << " e Turma " << aulas[b]->turma->id
+            << endl
+            << "└── Prof. " << aulas[a]->prof->nome << " e Prof. " << aulas[b]->prof->nome
+            << endl;
+    }
 }
