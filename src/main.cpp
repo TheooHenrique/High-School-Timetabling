@@ -45,9 +45,9 @@ int main() {
 
     // ==================== PRIMEIRO ANO ====================
     int qtdMaterias1;
-    cout << "Insira aqui a quantidade de matérias obrigatórias para os primeiros anos: ";
+    cout << "Insira aqui a quantidade de matérias obrigatórias para o primeiro ano: ";
     cin >> qtdMaterias1;
-    cout << "Insira aqui as matérias obrigatórias para os primeiros anos: ";
+    cout << "Insira aqui as matérias obrigatórias para o primeiro ano: ";
     for (int i = 0; i < qtdMaterias1; ++i){
         cin >> nomeDisc;
         auto disc = buscarDisciplinaPorNome(disciplinas, nomeDisc);
