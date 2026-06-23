@@ -107,7 +107,7 @@ int main() {
         cargaHorariaTerceiro.push_back(ch);
     }
 
-    //logica final da criação de turmas depois de coletar todos os dados
+    // Lógica final da criação de turmas depois de coletar todos os dados
     for (int i = 0; i < qtd1; ++i){
         turmas.push_back(make_shared<Turma>(anoEscolar::PRIMEIRO_ANO, ++ctTurma, obrigatoriasPrimeiro, cargaHorariaPrimeiro));
     }
