@@ -5,10 +5,11 @@
 #include "../include/salas.hpp"
 #include "../include/turmas.hpp"
 #include <iostream>
+using namespace std;
 
-    std::shared_ptr<Disciplina> buscarDisciplinaPorNome(
-    const std::vector<std::shared_ptr<Disciplina>>& listaDisciplinas, 
-    const std::string& nomeBuscado) 
+    shared_ptr<Disciplina> buscarDisciplinaPorNome(
+    const vector<shared_ptr<Disciplina>>& listaDisciplinas, 
+    const string& nomeBuscado) 
 {
     for (const auto& disc : listaDisciplinas) {
         if (disc->nome == nomeBuscado) {
@@ -18,14 +19,13 @@
     return nullptr;
 }
 
-using namespace std;
 int main() {
     int qtd1, qtd2, qtd3, ctDisc = 0, ctProf = 0, ctSala = 0, ctTurma = 0, qtdSalas;
-    std::vector<std::shared_ptr<Disciplina>> disciplinas;
-    std::vector<std::shared_ptr<Professor>> professores;
-    std::vector<std::shared_ptr<Turma>> turmas;
-    std::vector<std::shared_ptr<Aula>> aulas;
-    std::vector<std::shared_ptr<Sala>> salas;
+    vector<shared_ptr<Disciplina>> disciplinas;
+    vector<shared_ptr<Professor>> professores;
+    vector<shared_ptr<Turma>> turmas;
+    vector<shared_ptr<Aula>> aulas;
+    vector<shared_ptr<Sala>> salas;
 
     vector<shared_ptr<Disciplina>> obrigatoriasPrimeiro;
     vector<shared_ptr<Disciplina>> obrigatoriasSegundo;
