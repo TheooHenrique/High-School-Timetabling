@@ -134,23 +134,23 @@ int main() {
                 );
     }
 
-    //Lógica de adicionar professores
+    // Lógica de adicionar professores
     cout << "Agora adicione o nome dos professores, associados a suas respectivas disciplinas ";
     string nomeProf;
-    for (int i = 0; i < disciplinas.size(); ++i){
+    for (size_t i = 0; i < disciplinas.size(); ++i){
         cout << "Professor de " << disciplinas[i]->nome; 
         cin >> nomeProf;
         professores.push_back(make_shared<Professor>(++ctProf, nomeProf, disciplinas[i]));
     }
 
-    //Lógica para adicionar salas
+    // Lógica para adicionar salas
     cout << "Quantas salas tem na escola?";
     cin >> qtdSalas;
     for (int i = 0; i < qtdSalas; ++i){
         salas.push_back(make_shared<Sala>(++ctSala));
     }
 
-    //TESTANDO NOSSOS CASOS DE TESTE:
+    // TESTANDO NOSSOS CASOS DE TESTE:
     cout << "\n\n\n=-=-=-=-=-=TESTANDO OS CASOS DE TESTE =-=-=-=-=-=" << endl;
     cout << endl << "LISTANDO TODAS AS DISCIPLINAS: " << endl;
     for (auto i : disciplinas){
