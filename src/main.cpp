@@ -7,9 +7,10 @@
 #include <iostream>
 using namespace std;
 
-    shared_ptr<Disciplina> buscarDisciplinaPorNome(
-    const vector<shared_ptr<Disciplina>>& listaDisciplinas, 
-    const string& nomeBuscado) 
+shared_ptr<Disciplina> buscarDisciplinaPorNome(
+        const vector<shared_ptr<Disciplina>>& listaDisciplinas, 
+        const string& nomeBuscado
+        ) 
 {
     for (const auto& disc : listaDisciplinas) {
         if (disc->nome == nomeBuscado) {
@@ -19,8 +20,20 @@ using namespace std;
     return nullptr;
 }
 
+shared_ptr<Professor> buscarProfessorPorDisciplina(
+        const vector<shared_ptr<Professor>>& listaProfessores, 
+        shared_ptr<Disciplina>& disciplina
+        ) 
+{
+    for (const auto& prof : listaProfessores) {
+        if (prof->materiaLecionada == disciplina) {
+            return prof; 
+        }
+    }
+    return nullptr;
+}
 int main() {
-    int qtd1, qtd2, qtd3, ctDisc = 0, ctProf = 0, ctSala = 0, ctTurma = 0, qtdSalas;
+    int qtd1, qtd2, qtd3, ctDisc = 0, ctProf = 0, ctSala = 0, ctTurma = 0, ctAula = 0, qtdSalas;
     vector<shared_ptr<Disciplina>> disciplinas;
     vector<shared_ptr<Professor>> professores;
     vector<shared_ptr<Turma>> turmas;
@@ -32,13 +45,13 @@ int main() {
     vector<shared_ptr<Disciplina>> obrigatoriasTerceiro;
     
     //GIGANTESCA CONSTRUCAO DE TURMAS:
-    cout << "Insira aqui a quantidade de turmas de primeiro ano";
+    cout << "Insira aqui a quantidade de turmas de primeiro ano: ";
     cin >> qtd1;
 
-    cout << "Insira aqui a quantidade de turmas de segundo ano";
+    cout << "Insira aqui a quantidade de turmas de segundo ano: ";
     cin >> qtd2;
 
-    cout << "Insira aqui a quantidade de turmas de terceiro ano";
+    cout << "Insira aqui a quantidade de turmas de terceiro ano: ";
     cin >> qtd3;
 
     string nomeDisc;
@@ -60,16 +73,16 @@ int main() {
     int ch;
     vector<int> cargaHorariaPrimeiro;
     for (const auto& i : obrigatoriasPrimeiro){
-        cout << "Insira a carga Horária da disciplina " << i->nome << "para o Primeiro ano: ";
+        cout << "Insira a carga Horária da disciplina " << i->nome << " para o Primeiro ano: ";
         cin >>  ch;
         cargaHorariaPrimeiro.push_back(ch);
     }
 
     // ==================== SEGUNDO ANO ====================
     int qtdMaterias2;
-    cout << "Insira aqui a quantidade de matérias obrigatórias para os segundos anos: ";
+    cout << "Insira aqui a quantidade de matérias obrigatórias para o segundo ano: ";
     cin >> qtdMaterias2;
-    cout << "Insira aqui as matérias obrigatórias para os segundos anos, seguido pela carga horária semanal: ";
+    cout << "Insira aqui as matérias obrigatórias para os segundo ano: ";
     for (int i = 0; i < qtdMaterias2; ++i){
         cin >> nomeDisc;
         auto disc = buscarDisciplinaPorNome(disciplinas, nomeDisc);
@@ -81,16 +94,16 @@ int main() {
     }
     vector<int> cargaHorariaSegundo;
     for (const auto& i : obrigatoriasSegundo){
-        cout << "Insira a carga Horária da disciplina " << i->nome << "para o Segundo ano: ";
+        cout << "Insira a carga Horária da disciplina " << i->nome << " para o Segundo ano: ";
         cin >>  ch;
         cargaHorariaSegundo.push_back(ch);
     }
 
     // ==================== TERCEIRO ANO ====================
     int qtdMaterias3;
-    cout << "Insira aqui a quantidade de matérias obrigatórias para os terceiros anos: ";
+    cout << "Insira aqui a quantidade de matérias obrigatórias para o terceiro ano: ";
     cin >> qtdMaterias3;
-    cout << "Insira aqui as matérias obrigatórias para os terceiros anos, seguido pela carga horária semanal: ";
+    cout << "Insira aqui as matérias obrigatórias para o terceiro ano: ";
     for (int i = 0; i < qtdMaterias3; ++i) {
         cin >> nomeDisc;
         auto disc = buscarDisciplinaPorNome(disciplinas, nomeDisc);
@@ -102,7 +115,7 @@ int main() {
     }
     vector<int> cargaHorariaTerceiro;
     for (const auto& i : obrigatoriasTerceiro){
-        cout << "Insira a carga Horária da disciplina " << i->nome << "para o Terceiro ano: ";
+        cout << "Insira a carga Horária da disciplina " << i->nome << " para o Terceiro ano: ";
         cin >>  ch;
         cargaHorariaTerceiro.push_back(ch);
     }
@@ -135,19 +148,36 @@ int main() {
     }
 
     // Lógica de adicionar professores
-    cout << "Agora adicione o nome dos professores, associados a suas respectivas disciplinas ";
+    cout << "Agora adicione o nome dos professores, associados a suas respectivas disciplinas:\n ";
     string nomeProf;
     for (size_t i = 0; i < disciplinas.size(); ++i){
-        cout << "Professor de " << disciplinas[i]->nome; 
+        cout << "-> Professor de " << disciplinas[i]->nome << ": "; 
         cin >> nomeProf;
         professores.push_back(make_shared<Professor>(++ctProf, nomeProf, disciplinas[i]));
     }
 
     // Lógica para adicionar salas
-    cout << "Quantas salas tem na escola?";
+    cout << "Quantas salas tem na escola? ";
     cin >> qtdSalas;
     for (int i = 0; i < qtdSalas; ++i){
         salas.push_back(make_shared<Sala>(++ctSala));
+    }
+
+    // Instanciar as classes 'aula'
+    size_t salaUsada = 0;
+    for (auto &t : turmas) {
+        for (size_t i = 0; i < t->disciplinasObrigatorias.size(); ++i) {
+            auto &d = t->disciplinasObrigatorias[i];
+            for (size_t j = 0; j < t->cargaHorariaPorDisciplina[i]; ++j) {
+                aulas.push_back(make_shared<Aula>(
+                            ++ctAula,
+                            buscarProfessorPorDisciplina(professores, d),
+                            t,
+                            salas[salaUsada]
+                            ));
+                salaUsada = (salaUsada + 1) % qtdSalas ;
+            }
+        }
     }
 
     // TESTANDO NOSSOS CASOS DE TESTE:
@@ -157,7 +187,7 @@ int main() {
         cout << "Id: " << i->id << " | Nome: " << i->nome << endl;
     }
     cout << endl;
-    cout << endl << "LISTANDO TODOSOS PROFS: " << endl;
+    cout << endl << "LISTANDO TODOS OS PROFS: " << endl;
     for (auto i : professores){
         cout << "Id: " << i->id << " | Nome: " << i->nome << " | Disciplina: " << i->materiaLecionada->nome << endl;
     }
@@ -177,10 +207,10 @@ int main() {
         cout << endl;
 
         cout << "  Grade Curricular desta Turma:" << endl;
-        
+
         for (size_t j = 0; j < i->disciplinasObrigatorias.size(); ++j) {
             cout << "    -> " << i->disciplinasObrigatorias[j]->nome 
-                 << " | Carga Horaria: " << i->cargaHorariaPorDisciplina[j] << " aulas" << endl;
+                << " | Carga Horaria: " << i->cargaHorariaPorDisciplina[j] << " aulas" << endl;
         }
     }
     cout << "----------------------------------------" << endl;
@@ -190,7 +220,26 @@ int main() {
         cout << "Sala ID: " << i->id << endl;
     }
 
-
-
+    cout << endl << "LISTANDO TODAS AS AULAS: " << endl;
+    for (auto& i : aulas){
+        cout << "Aula ID: "
+            << i->id
+            << endl
+            << "├── "
+            << "Turma ID: " << i->turma->id
+            << endl
+            << "├── "
+            << "Professor: "
+            << i->prof->nome
+            << endl
+            << "├── "
+            << "Matéria: "
+            << i->prof->materiaLecionada->nome
+            << endl
+            << "└── "
+            << "Sala: "
+            << i->sala->id
+            << endl;
+    }
 
 }
