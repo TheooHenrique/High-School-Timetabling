@@ -108,16 +108,33 @@ int main() {
     }
 
     // Lógica final da criação de turmas depois de coletar todos os dados
-    for (int i = 0; i < qtd1; ++i){
-        turmas.push_back(make_shared<Turma>(anoEscolar::PRIMEIRO_ANO, ++ctTurma, obrigatoriasPrimeiro, cargaHorariaPrimeiro));
+    for (int i = 0; i < qtd1; ++i) {
+        turmas.push_back(make_shared<Turma>(
+                    anoEscolar::PRIMEIRO_ANO,
+                    ++ctTurma,
+                    obrigatoriasPrimeiro,
+                    cargaHorariaPrimeiro
+                    )
+                );
     }
-    for (int i = 0; i < qtd2; ++i){
-        turmas.push_back(make_shared<Turma>(anoEscolar::SEGUNDO_ANO, ++ctTurma, obrigatoriasSegundo, cargaHorariaSegundo));
+    for (int i = 0; i < qtd2; ++i) {
+        turmas.push_back(make_shared<Turma>(anoEscolar::SEGUNDO_ANO,
+                    ++ctTurma,
+                    obrigatoriasSegundo,
+                    cargaHorariaSegundo
+                    )
+                );
     }
-    for (int i = 0; i < qtd3; ++i){
-        turmas.push_back(make_shared<Turma>(anoEscolar::TERCEIRO_ANO, ++ctTurma, obrigatoriasTerceiro, cargaHorariaTerceiro));
+    for (int i = 0; i < qtd3; ++i) {
+        turmas.push_back(make_shared<Turma>(anoEscolar::TERCEIRO_ANO,
+                    ++ctTurma,
+                    obrigatoriasTerceiro,
+                    cargaHorariaTerceiro
+                    )
+                );
     }
-        //Lógica de adicionar professores
+
+    //Lógica de adicionar professores
     cout << "Agora adicione o nome dos professores, associados a suas respectivas disciplinas ";
     string nomeProf;
     for (int i = 0; i < disciplinas.size(); ++i){
@@ -149,7 +166,7 @@ int main() {
     for (const auto& i : turmas){
         cout << "----------------------------------------" << endl;
         cout << "Turma ID: " << i->id << " | Ano Escolar: ";
-        
+
         // Convertendo o enum para um texto legível na tela
         switch(i->serie) {
             case anoEscolar::PRIMEIRO_ANO: cout << "1o Ano"; break;
