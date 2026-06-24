@@ -5,6 +5,7 @@
 #include "../include/salas.hpp"
 #include "../include/turmas.hpp"
 #include <iostream>
+#include <vector>
 using namespace std;
 
 bool conflito(shared_ptr<Aula>a, shared_ptr<Aula>b) {
@@ -50,6 +51,8 @@ int main() {
     vector<shared_ptr<Disciplina>> obrigatoriasPrimeiro;
     vector<shared_ptr<Disciplina>> obrigatoriasSegundo;
     vector<shared_ptr<Disciplina>> obrigatoriasTerceiro;
+
+    vector<vector<shared_ptr<Aula>>> listaDeAdjacencia;
     
     //GIGANTESCA CONSTRUCAO DE TURMAS:
     cout << "Insira aqui a quantidade de turmas de primeiro ano: ";
@@ -177,7 +180,7 @@ int main() {
             auto &d = t->disciplinasObrigatorias[i];
             for (size_t j = 0; j < t->cargaHorariaPorDisciplina[i]; ++j) {
                 aulas.push_back(make_shared<Aula>(
-                            ++ctAula,
+                            ctAula++,
                             buscarProfessorPorDisciplina(professores, d),
                             t,
                             salas[salaUsada]
@@ -185,6 +188,19 @@ int main() {
                 salaUsada = (salaUsada + 1) % qtdSalas ;
             }
         }
+    }
+
+    // Criando a lista de adjacência
+    for (size_t aula = 0; aula < aulas.size(); ++aula) {
+        vector<shared_ptr<Aula>> conflitos;
+        for (auto &outra_aula : aulas) {
+            if (aulas[aula] != outra_aula) {
+                if (conflito(aulas[aula], outra_aula)) {
+                    conflitos.push_back(outra_aula);
+                }
+            }
+        }
+        listaDeAdjacencia.push_back(conflitos);
     }
 
     // TESTANDO NOSSOS CASOS DE TESTE:
@@ -271,6 +287,27 @@ int main() {
             << "├── Turma " << aulas[a]->turma->id << " e Turma " << aulas[b]->turma->id
             << endl
             << "└── Prof. " << aulas[a]->prof->nome << " e Prof. " << aulas[b]->prof->nome
-            << endl;
+            << endl << endl;
     }
+
+    cout
+        << "----------------------------------------"
+        << endl
+        << "Listando adjacências:"
+        << endl
+        << "----------------------------------------"
+        << endl << endl;
+
+    for (size_t vert = 0; vert < listaDeAdjacencia.size(); ++vert) {
+        cout << "Vértice " << vert << ": ";
+        for (auto &adjacente : listaDeAdjacencia[vert]) {
+            if (adjacente == listaDeAdjacencia[vert].back()) {
+                cout << adjacente->id << endl;
+            } else {
+                cout << adjacente->id << ", ";
+            }
+        }
+    }
+
+
 }
