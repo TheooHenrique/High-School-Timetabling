@@ -4,8 +4,11 @@
 #include "../include/professores.hpp"
 #include "../include/salas.hpp"
 #include "../include/turmas.hpp"
+
 #include <iostream>
+#include <string>
 #include <vector>
+#include <set>
 using namespace std;
 
 bool conflito(shared_ptr<Aula>a, shared_ptr<Aula>b) {
@@ -40,6 +43,146 @@ shared_ptr<Professor> buscarProfessorPorDisciplina(
     }
     return nullptr;
 }
+
+vector<int> calcularGrau(vector<vector<shared_ptr<Aula>>> listaDeAdjacencia) {
+    vector<int> listaDeGrau(listaDeAdjacencia.size());
+
+    // Calcular o grau, que será o tamanho do nó referente ao vértice i
+    // na lista de adjacência.
+    for (size_t i = 0; i < listaDeAdjacencia.size(); i++)
+        listaDeGrau[i] = listaDeAdjacencia[i].size();
+
+    return listaDeGrau;
+}
+
+vector<int> dsatur(
+        const vector<shared_ptr<Aula>>& aulas,
+        const vector<vector<shared_ptr<Aula>>>& listaDeAdjacencia)
+{
+    int n = aulas.size();
+
+    //====== Etapa 0) Estabelecer estruturas de dados representantes
+
+    // A posição i corresponde ao vértice i e armazena sua cor:
+    vector<int> cor(n, -1); // (-1 significa não colorido)
+    // Grau de cada vértice:
+    vector<int> grau = calcularGrau(listaDeAdjacencia);
+    // Nível de saturação (cores vizinhas distintas) de cada vértice:
+    vector<int> saturacao(n, 0);
+    // O set é utilizado para a adição de apenas cores novas, sem repetição,
+    // além de que para calcular a saturação, é só olhar o tamanho do set.
+    vector<set<int>> coresVizinhas(n);
+
+    //====== Etapa 1) Colorir o vértice de maior grau:
+
+    int primeiro = 0;
+
+    // Começar com o vértice de maior grau:
+    for (int i = 1; i < n; i++)
+        if (grau[primeiro] < grau[i])
+            primeiro = i;
+    cor[primeiro] = 0;
+
+    // Atualizar os vizinhos que agora existe uma cor 0 adjacente.
+    for (auto vizinho : listaDeAdjacencia[primeiro]) {
+        int id = vizinho->id;
+        coresVizinhas[id].insert(0);
+        saturacao[id] = 1;
+    }
+
+    //====== Etapa 2) Processar todos os outros vértices
+    for (int qtdColoridos = 1; qtdColoridos < n; qtdColoridos++) {
+
+        //====== Etapa 2a) Escolher, de acordo com a lógica de saturação ou
+        // de desempate do DSatur, o melhor vértice:
+
+        int melhor = -1;
+        // Percorrer todos os vértices não coloridos para
+        // encontrar o "melhor" vértice 
+        for (int i = 0; i < n; i++) {
+
+            // Ignorar os vértices já coloridos:
+            if (cor[i] != -1)
+            {
+                continue;
+            }
+
+            // O que seria escolher o "melhor":
+            //   → 1° O mais saturado, de acordo com a lista de saturação.
+            //   → 2° Em caso de empate, o de maior grau.
+            //
+            // OBS: como o loop pode estar na primeira iteração,
+            // é preciso também tratar esse primeiro caso antes de tentar
+            // acessar saturacao[melhor], onde o valor default de melhor
+            // pode ser -1.
+
+            if (melhor == -1)
+            {
+                melhor = i;
+            }
+            else if (saturacao[i] > saturacao[melhor])
+            {
+                melhor = i;
+            }
+            else if (saturacao[i] == saturacao[melhor])
+            {
+                if (grau[i] > grau[melhor])
+                    melhor = i;
+            }
+        }
+
+        //====== Etapa 2b) Escolher cor, preferencialmente sem "criar" uma nova.
+
+        // Para cada vértice, temos cores que não podemos escolher.
+        // Este set mantém apenas cores únicas (sem repetição),
+        // com a busca e inserção O(log n)
+        set<int> proibidas;
+
+        // Olhar a cor do vizinho e "anotar" como cor proibida:
+        for (auto vizinho : listaDeAdjacencia[melhor]) {
+
+            int id = vizinho->id;
+
+            if (cor[id] != -1)
+                proibidas.insert(cor[id]);
+        }
+
+        // Escolher, finalmente, uma cor:
+        //     Como a cor não pode ser igual a do vizinho, procura-se
+        // a menor cor que não aparece entre os vizinhos. A menor cor,
+        // é geralmente uma cor já existente, mas nem sempre.
+        // Por exemplo:
+        //     - Supondo um nó onde seus 3 vizinhos possuem cores 0, 2 e 4,
+        // a "menor cor" seria a cor 1, que é uma cor já utilizada.
+        //     - Considerando outro nó onde seus 4 vizinhos possuem cores 0,
+        // 1, 2 e 3, a "menor cor" seria a cor 4, pois ela é a única diferente
+        // dos seus vizinhos.
+
+        int talvezCor = 0;
+        // .count procura no set de cores proibidas o valor 'talvezCor',
+        // retornando 0 se não encontrar e 1 se encontrar
+        while (proibidas.count(talvezCor))
+            talvezCor++;
+
+        // Finalmente, colorir o melhor vértice com a menor cor
+        cor[melhor] = talvezCor;
+
+        //====== Etapa 2c) Atualizar a lista de saturação e a lista
+        // de cores vizinhas com a nova cor.
+        for (auto vizinho : listaDeAdjacencia[melhor]) {
+
+            int id = vizinho->id;
+
+            if (cor[id] == -1) {
+                coresVizinhas[id].insert(talvezCor);
+                saturacao[id] = coresVizinhas[id].size();
+            }
+        }
+}
+
+return cor;
+}
+
 int main() {
     int qtd1, qtd2, qtd3, ctDisc = 0, ctProf = 0, ctSala = 0, ctTurma = 0, ctAula = 0, qtdSalas;
     vector<shared_ptr<Disciplina>> disciplinas;
@@ -53,7 +196,7 @@ int main() {
     vector<shared_ptr<Disciplina>> obrigatoriasTerceiro;
 
     vector<vector<shared_ptr<Aula>>> listaDeAdjacencia;
-    
+
     //GIGANTESCA CONSTRUCAO DE TURMAS:
     cout << "Insira aqui a quantidade de turmas de primeiro ano: ";
     cin >> qtd1;
@@ -71,7 +214,7 @@ int main() {
     cout << "Insira aqui a quantidade de matérias obrigatórias para o primeiro ano: ";
     cin >> qtdMaterias1;
     cout << "Insira aqui as matérias obrigatórias para o primeiro ano: ";
-    for (int i = 0; i < qtdMaterias1; ++i){
+    for (int i = 0; i < qtdMaterias1; ++i) {
         cin >> nomeDisc;
         auto disc = buscarDisciplinaPorNome(disciplinas, nomeDisc);
         if ( disc == nullptr){
@@ -82,7 +225,7 @@ int main() {
     }
     int ch;
     vector<int> cargaHorariaPrimeiro;
-    for (const auto& i : obrigatoriasPrimeiro){
+    for (const auto& i : obrigatoriasPrimeiro) {
         cout << "Insira a carga Horária da disciplina " << i->nome << " para o Primeiro ano: ";
         cin >>  ch;
         cargaHorariaPrimeiro.push_back(ch);
@@ -160,7 +303,7 @@ int main() {
     // Lógica de adicionar professores
     cout << "Agora adicione o nome dos professores, associados a suas respectivas disciplinas:\n ";
     string nomeProf;
-    for (size_t i = 0; i < disciplinas.size(); ++i){
+    for (size_t i = 0; i < disciplinas.size(); ++i) {
         cout << "-> Professor de " << disciplinas[i]->nome << ": "; 
         cin >> nomeProf;
         professores.push_back(make_shared<Professor>(++ctProf, nomeProf, disciplinas[i]));
@@ -169,7 +312,7 @@ int main() {
     // Lógica para adicionar salas
     cout << "Quantas salas tem na escola? ";
     cin >> qtdSalas;
-    for (int i = 0; i < qtdSalas; ++i){
+    for (int i = 0; i < qtdSalas; ++i) {
         salas.push_back(make_shared<Sala>(++ctSala));
     }
 
@@ -178,7 +321,7 @@ int main() {
     for (auto &t : turmas) {
         for (size_t i = 0; i < t->disciplinasObrigatorias.size(); ++i) {
             auto &d = t->disciplinasObrigatorias[i];
-            for (size_t j = 0; j < t->cargaHorariaPorDisciplina[i]; ++j) {
+            for (int j = 0; j < t->cargaHorariaPorDisciplina[i]; ++j) {
                 aulas.push_back(make_shared<Aula>(
                             ctAula++,
                             buscarProfessorPorDisciplina(professores, d),
@@ -202,6 +345,8 @@ int main() {
         }
         listaDeAdjacencia.push_back(conflitos);
     }
+
+    vector<int> cores = dsatur(aulas, listaDeAdjacencia);
 
     // TESTANDO NOSSOS CASOS DE TESTE:
     cout << "\n\n\n=-=-=-=-=-=TESTANDO OS CASOS DE TESTE =-=-=-=-=-=" << endl;
@@ -265,31 +410,6 @@ int main() {
             << endl;
     }
 
-    size_t a = 0;
-    size_t b = 10;
-
-    cout
-        << endl << endl
-        << "----------------------------------------"
-        << endl
-        << "Teste de Conflito:"
-        << endl
-        << "----------------------------------------"
-        << endl << endl;
-
-
-    if (conflito(aulas[a], aulas[b])) {
-        cout
-            << "Conflito: Aula " << aulas[a]->id << " e Aula " << aulas[b]->id
-            << endl
-            << "├── Sala " << aulas[a]->sala->id << " e Sala " << aulas[b]->sala->id
-            << endl
-            << "├── Turma " << aulas[a]->turma->id << " e Turma " << aulas[b]->turma->id
-            << endl
-            << "└── Prof. " << aulas[a]->prof->nome << " e Prof. " << aulas[b]->prof->nome
-            << endl << endl;
-    }
-
     cout
         << "----------------------------------------"
         << endl
@@ -300,6 +420,7 @@ int main() {
 
     for (size_t vert = 0; vert < listaDeAdjacencia.size(); ++vert) {
         cout << "Vértice " << vert << ": ";
+        if (listaDeAdjacencia[vert].size() == 0) cout << endl;
         for (auto &adjacente : listaDeAdjacencia[vert]) {
             if (adjacente == listaDeAdjacencia[vert].back()) {
                 cout << adjacente->id << endl;
@@ -309,5 +430,29 @@ int main() {
         }
     }
 
+    cout
+        << "----------------------------------------"
+        << endl
+        << "DSatur:"
+        << endl
+        << "----------------------------------------"
+        << endl << endl;
 
+    int maiorCor = 0;
+
+    for (size_t i = 0; i < cores.size(); i++) {
+
+        cout << "Aula "
+            << aulas[i]->id
+            << " -> Horario "
+            << cores[i]
+            << endl;
+
+        maiorCor = max(maiorCor, cores[i]);
+    }
+
+    cout << endl
+        << "Total de horarios necessarios: "
+        << maiorCor + 1
+        << endl;
 }

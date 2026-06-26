@@ -1,0 +1,6 @@
+#!/bin/sh
+
+g++ -std=c++23 aula.cpp disciplina.cpp main.cpp professores.cpp salas.cpp turmas.cpp -o ../bin/programa ; ../bin/programa < ../inputs/input_mais_simples.txt
+# $execute ; ../bin/programa < ../inputs/input_simples.txt
+# $execute ; ../bin/programa < ../inputs/input_impossivel.txt
+# $execute ; ../bin/programa
