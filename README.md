@@ -1,2 +1,6 @@
 # High-School-Timetabling
-A project developed to improve my graphs skills, in a context that i also can apply this project to the real world problems
+## Para compilar, basta rodar o comando:
+`g++ -std=c++17 src/*.cpp -o bin/programa && ./bin/programa < inputs/input_simples.txt`
+
+## NOTA:
+Se ele reclamar que a pasta bin não existe, basta criar e rodar o programa. Lembre-se de alterar o input para o input desejado.
