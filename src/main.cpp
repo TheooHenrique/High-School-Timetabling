@@ -159,10 +159,53 @@ vector<int> dsatur(
         // dos seus vizinhos.
 
         int talvezCor = 0;
-        // .count procura no set de cores proibidas o valor 'talvezCor',
-        // retornando 0 se não encontrar e 1 se encontrar
-        while (proibidas.count(talvezCor))
-            talvezCor++;
+        const int MAX_AULAS_POR_TURMA_NO_DIA = 4;
+        //essa é a magica (gambiarrenta) que pensei pra garantir que todos os dias sejam preenchidos.
+        //Até que funciona bem pra inputs grandes, em combinação com a regra de que cada turma só pode ter 3 aulas da mesma matéria por dia.
+        if (n >= 5 && qtdColoridos < 5) {
+            talvezCor = qtdColoridos * 12; //são 12 horarios por dia, preguica  de botar como variavel
+        }
+
+        while (true) {
+            // Se a cor já é usada por um vizinho, pula.
+            if (proibidas.count(talvezCor)) {
+                talvezCor++;
+                continue;
+            }
+
+            int diaAlvo = talvezCor / 12;
+            int aulasMesmaDisciplinaNoDia = 0;
+            int totalAulasDaTurmaNoDia = 0;
+
+            // Varre as aulas já coloridas
+            for (int i = 0; i < n; i++) {
+                if (cor[i] != -1 && (cor[i] / 12) == diaAlvo) {
+                    //se é mesma aula e mesmo prof, conta pra limitar as aulas por dias em 3
+                    if (aulas[i]->turma == aulas[melhor]->turma) {
+                        totalAulasDaTurmaNoDia++;
+                        if (aulas[i]->prof->materiaLecionada == aulas[melhor]->prof->materiaLecionada){
+                            aulasMesmaDisciplinaNoDia++;
+                        }
+                        
+                    }
+                }
+            }
+
+            //limita de fato as aulas por dia em 3
+            if (aulasMesmaDisciplinaNoDia >= 3) {
+                talvezCor++;
+                continue; 
+            }
+
+            if (totalAulasDaTurmaNoDia >= MAX_AULAS_POR_TURMA_NO_DIA) {
+                // Pula direto para o primeiro horário do próximo dia para acelerar o algoritmo
+                talvezCor = (diaAlvo + 1) * 12;
+                continue;
+            }
+
+            //se passou por todas as validações, é a cor ótima
+            break;
+        }
 
         // Finalmente, colorir o melhor vértice com a menor cor
         cor[melhor] = talvezCor;
@@ -438,21 +481,57 @@ int main() {
         << "----------------------------------------"
         << endl << endl;
 
-    int maiorCor = 0;
 
-    for (size_t i = 0; i < cores.size(); i++) {
+    vector<string> dias = {"Segunda", "Terça", "Quarta", "Quinta", "Sexta"};
+    vector<string> turnos = {"07:00 - 07:50", "07:50 - 08:40", "08:50 - 9:40", "09:40 - 10:30", "10:40 - 11:30", "11:30 - 12:20", "13:00 - 13:50", "13:50 - 14:40", "14:50 - 15:40", "15h40 - 16:30", "16:40 - 17:30", "17:30 - 18:20"};
+    
+    int aulasPorDia = 12; 
+    //vou deixar isso aqui variável ao invés de deixar 60 hardcoded
+    int totalHorariosDisponiveis = dias.size() * aulasPorDia;
 
-        cout << "Aula "
-            << aulas[i]->id
-            << " -> Horario "
-            << cores[i]
-            << endl;
+    bool alcancouLimite = false;
+    for (int c : cores) {
+        if (c >= totalHorariosDisponiveis) {
+            alcancouLimite = true;
+            break;
+        }
+    }
 
-        maiorCor = max(maiorCor, cores[i]);
+    if (alcancouLimite) {
+        cout << "\n====================================================\n";
+        cout << "   AVISO: IMPOSSÍVEL CALCULAR O CRONOGRAMA!\n";
+        cout << "====================================================\n";
+        cout << "O problema inserido possui restrições severas demais ou\n"
+             << "uma carga horária que ultrapassa os " << totalHorariosDisponiveis << " slots disponíveis.\n"
+             << "Reduza o número de aulas ou aumente a grade da escola.\n";
+        cout << "====================================================\n\n";
+        return 0; 
+    }
+
+    cout << "\n================ CRONOGRAMA ESCOLAR ================\n";
+    set<int> coresUnicasUtilizadas;
+
+    for (size_t i = 0; i < aulas.size(); ++i) {
+        int corAlocada = cores[i];
+        
+        if (corAlocada == -1) {
+            cout << "Aula " << aulas[i]->id << " [" << aulas[i]->prof->materiaLecionada->nome << "] -> NÃO ALOCADA" << endl;
+            continue;
+        }
+        coresUnicasUtilizadas.insert(corAlocada);
+        //aquele mesmo esquema que a gente fez pra a logica de salas usadas
+        int indiceDia = corAlocada / aulasPorDia;
+        int indiceTurno = corAlocada % aulasPorDia;
+
+        cout << "Aula " << aulas[i]->id << " | "
+             << "Turma: " << static_cast<int>(aulas[i]->turma->serie) << "º Ano | "
+             << "Prof: " << aulas[i]->prof->nome << " (" << aulas[i]->prof->materiaLecionada->nome << ") | "
+             << "Sala: " << aulas[i]->sala->id << " | "
+             << "Data: " << dias[indiceDia] << " às " << turnos[indiceTurno] << endl;
     }
 
     cout << endl
         << "Total de horarios necessarios: "
-        << maiorCor + 1
+        << coresUnicasUtilizadas.size()
         << endl;
 }
